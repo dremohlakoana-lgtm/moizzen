@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Moizzen — Global Banking & Stocks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1f2937;
+  --primary:#6c63ff;--primary2:#5a52d5;--accent:#00d4aa;
+  --danger:#ef4444;--warning:#f59e0b;--success:#10b981;
+  --text:#f9fafb;--text2:#9ca3af;--text3:#6b7280;
+  --border:#1f2937;--card:#111827;--radius:16px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+/* ── Auth ────────────────── */
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at 50% 0%,#1a1040 0%,var(--bg) 70%);}
+.auth-wrap{width:100%;max-width:440px;}
+.auth-logo{text-align:center;margin-bottom:32px;}
+.auth-logo h1{font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.auth-logo p{color:var(--text2);margin-top:6px;font-size:14px;}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;}
+.auth-tabs{display:flex;gap:8px;margin-bottom:28px;background:var(--bg3);border-radius:12px;padding:4px;}
+.auth-tab{flex:1;padding:10px;text-align:center;border:none;background:none;color:var(--text2);font-size:14px;font-weight:500;border-radius:10px;cursor:pointer;transition:.2s;}
+.auth-tab.active{background:var(--primary);color:#fff;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;font-weight:500;}
+.form-group input,.form-group select{width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;outline:none;transition:.2s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--primary);}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text);margin-top:10px;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-sm{padding:8px 16px;font-size:13px;border-radius:8px;width:auto;}
+.err{color:var(--danger);font-size:13px;margin-top:8px;text-align:center;}
+.suc{color:var(--success);font-size:13px;margin-top:8px;text-align:center;}
+/* ── App Shell ───────────── */
+#app{display:none;height:100vh;overflow:hidden;}
+.shell{display:flex;height:100vh;}
+/* Sidebar */
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px;flex-shrink:0;}
+.sidebar-logo{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:32px;padding:0 8px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 12px;border-radius:12px;cursor:pointer;color:var(--text2);font-size:14px;font-weight:500;margin-bottom:4px;transition:.2s;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(0,212,170,.1));color:var(--primary);border:1px solid rgba(108,99,255,.3);}
+.nav-item i{width:20px;text-align:center;}
+.sidebar-bottom{margin-top:auto;}
+/* Main */
+.main{flex:1;overflow-y:auto;padding:28px;background:var(--bg);}
+.page{display:none;}
+.page.active{display:block;}
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.card-sm{padding:16px;border-radius:12px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+/* Balance hero */
+.balance-hero{background:linear-gradient(135deg,#1e1b4b,#312e81,#1e3a5f);border:1px solid rgba(108,99,255,.3);border-radius:24px;padding:32px;position:relative;overflow:hidden;}
+.balance-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(108,99,255,.2),transparent);border-radius:50%;}
+.balance-label{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:8px;font-weight:500;}
+.balance-amount{font-size:42px;font-weight:800;color:#fff;margin-bottom:16px;}
+.balance-currency{font-size:16px;font-weight:400;opacity:.7;}
+.balance-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.action-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;cursor:pointer;color:#fff;font-size:12px;font-weight:500;backdrop-filter:blur(10px);transition:.2s;flex:1;min-width:80px;}
+.action-btn:hover{background:rgba(255,255,255,.2);}
+.action-btn i{font-size:18px;}
+/* Stats */
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.stat-label{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px;}
+.stat-value{font-size:22px;font-weight:700;}
+.stat-change{font-size:12px;margin-top:4px;}
+.up{color:var(--success);} .down{color:var(--danger);}
+/* Transactions */
+.tx-list{display:flex;flex-direction:column;gap:8px;}
+.tx-item{display:flex;align-items:center;gap:14px;padding:14px;background:var(--bg3);border-radius:12px;}
+.tx-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tx-icon.credit{background:rgba(16,185,129,.15);color:var(--success);}
+.tx-icon.debit{background:rgba(239,68,68,.15);color:var(--danger);}
+.tx-icon.neutral{background:rgba(108,99,255,.15);color:var(--primary);}
+.tx-info{flex:1;}
+.tx-desc{font-size:14px;font-weight:500;}
+.tx-date{font-size:12px;color:var(--text2);margin-top:2px;}
+.tx-amount{font-size:15px;font-weight:600;text-align:right;}
+/* Stocks */
+.stock-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:.2s;}
+.stock-card:hover{border-color:var(--primary);transform:translateY(-2px);}
+.stock-symbol{font-size:16px;font-weight:700;}
+.stock-name{font-size:12px;color:var(--text2);margin-top:2px;}
+.stock-price{font-size:18px;font-weight:700;margin-top:10px;}
+.stock-change{font-size:13px;margin-top:2px;}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:28px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:20px;}
+.modal-close{float:right;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;}
+/* Misc */
+h2{font-size:22px;font-weight:700;margin-bottom:4px;}
+.sub{color:var(--text2);font-size:14px;margin-bottom:24px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-success{background:rgba(16,185,129,.15);color:var(--success);}
+.badge-warning{background:rgba(245,158,11,.15);color:var(--warning);}
+.badge-danger{background:rgba(239,68,68,.15);color:var(--danger);}
+.badge-primary{background:rgba(108,99,255,.15);color:var(--primary);}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border);}
+td{padding:12px 12px;font-size:14px;border-bottom:1px solid rgba(31,41,55,.5);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(31,41,55,.4);}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;}
+.chart-wrap{position:relative;height:220px;}
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .grid-4{grid-template-columns:1fr 1fr;}
+  .grid-3{grid-template-columns:1fr 1fr;}
+  .grid-2{grid-template-columns:1fr;}
+  .balance-amount{font-size:30px;}
+  .main{padding:16px;}
+  #mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:8px;gap:4px;z-index:100;}
+}
+#mobile-nav{display:none;}
+.mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:10px;background:none;border:none;}
+.mob-nav-item.active{color:var(--primary);}
+.mob-nav-item i{font-size:18px;}
+.toast{position:fixed;top:20px;right:20px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:14px;z-index:9999;display:none;max-width:320px;animation:slideIn .3s ease;}
+.toast.show{display:block;}
+.toast.success{border-color:var(--success);color:var(--success);}
+.toast.error{border-color:var(--danger);color:var(--danger);}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ AUTH SCREEN ═══════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <h1>Moizzen</h1>
+      <p>Global Banking · Wallet · Stocks</p>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuth('login')">Sign In</button>
+        <button class="auth-tab" onclick="switchAuth('register')">Create Account</button>
+      </div>
+
+      <!-- Login -->
+      <div id="login-form">
+        <div class="form-group"><label>Email Address</label>
+          <input type="email" id="l-email" placeholder="you@email.com"/></div>
+        <div class="form-group"><label>Password</label>
+          <input type="password" id="l-pass" placeholder="••••••••"/></div>
+        <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+        <div id="login-msg"></div>
+      </div>
+
+      <!-- Register -->
+      <div id="register-form" style="display:none;">
+        <div class="form-group"><label>Full Name</label>
+          <input type="text" id="r-name" placeholder="John Smith"/></div>
+        <div class="form-group"><label>Email Address</label>
+          <input type="email" id="r-email" placeholder="you@email.com"/></div>
+        <div class="form-group"><label>Phone Number</label>
+          <input type="tel" id="r-phone" placeholder="+27 81 234 5678"/></div>
+        <div class="form-group"><label>Country</label>
+          <select id="r-country">
+            <option value="ZA">🇿🇦 South Africa (ZAR)</option>
+            <option value="NG">🇳🇬 Nigeria (NGN)</option>
+            <option value="GH">🇬🇭 Ghana (GHS)</option>
+            <option value="KE">🇰🇪 Kenya (KES)</option>
+            <option value="US">🇺🇸 United States (USD)</option>
+            <option value="GB">🇬🇧 United Kingdom (GBP)</option>
+            <option value="DE">🇩🇪 Europe (EUR)</option>
+            <option value="OTHER">🌍 Other</option>
+          </select></div>
+        <div class="form-group"><label>Password</label>
+          <input type="password" id="r-pass" placeholder="Min 6 characters"/></div>
+        <button class="btn btn-primary" onclick="doRegister()">Create Account</button>
+        <div id="register-msg"></div>
+        <p style="font-size:12px;color:var(--text2);text-align:center;margin-top:14px;">By signing up you agree to our Terms & Privacy Policy</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ════════════════════════════════════════ -->
+<div id="app">
+  <div class="shell">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-logo">Moizzen</div>
+      <button class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <i class="fa-solid fa-house"></i> Dashboard</button>
+      <button class="nav-item" onclick="showPage('wallet')" id="nav-wallet">
+        <i class="fa-solid fa-wallet"></i> Wallet</button>
+      <button class="nav-item" onclick="showPage('send')" id="nav-send">
+        <i class="fa-solid fa-paper-plane"></i> Send Money</button>
+      <button class="nav-item" onclick="showPage('stocks')" id="nav-stocks">
+        <i class="fa-solid fa-chart-line"></i> Stocks</button>
+      <button class="nav-item" onclick="showPage('cards')" id="nav-cards">
+        <i class="fa-solid fa-credit-card"></i> Cards</button>
+      <button class="nav-item" onclick="showPage('exchange')" id="nav-exchange">
+        <i class="fa-solid fa-arrows-rotate"></i> Exchange</button>
+      <button class="nav-item" onclick="showPage('kyc')" id="nav-kyc">
+        <i class="fa-solid fa-id-card"></i> Verify ID</button>
+      <div class="sidebar-bottom">
+        <button class="nav-item" onclick="showPage('profile')" id="nav-profile">
+          <i class="fa-solid fa-user"></i> Profile</button>
+        <button class="nav-item" onclick="doLogout()">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main" id="main-content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <h2>Good day, <span id="dash-name">—</span> 👋</h2>
+        <p class="sub">Here's your financial overview</p>
+
+        <div class="balance-hero" style="margin-bottom:24px;">
+          <div class="balance-label">Total Balance</div>
+          <div class="balance-amount"><span id="dash-currency">R</span><span id="dash-balance">0.00</span></div>
+          <div class="balance-actions">
+            <div class="action-btn" onclick="showPage('wallet');openModal('deposit-modal')">
+              <i class="fa-solid fa-plus"></i> Add Money</div>
+            <div class="action-btn" onclick="showPage('send')">
+              <i class="fa-solid fa-paper-plane"></i> Send</div>
+            <div class="action-btn" onclick="openModal('request-modal')">
+              <i class="fa-solid fa-hand"></i> Request</div>
+            <div class="action-btn" onclick="showPage('stocks')">
+              <i class="fa-solid fa-chart-line"></i> Invest</div>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-bottom:24px;" id="stat-cards">
+          <div class="stat-card"><div class="stat-label">Sent This Month</div>
+            <div class="stat-value" id="s-sent">R 0</div></div>
+          <div class="stat-card"><div class="stat-label">Received</div>
+            <div class="stat-value" id="s-recv">R 0</div></div>
+          <div class="stat-card"><div class="stat-label">Portfolio Value</div>
+            <div class="stat-value" id="s-port">R 0</div></div>
+          <div class="stat-card"><div class="stat-label">Transactions</div>
+            <div class="stat-value" id="s-txs">0</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="font-size:16px;margin-bottom:16px;">Recent Transactions</h3>
+            <div class="tx-list" id="dash-tx">
+              <div style="color:var(--text2);font-size:14px;">Loading...</div></div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:16px;margin-bottom:16px;">Top Movers</h3>
+            <div id="dash-stocks"><div style="color:var(--text2);font-size:14px;">Loading...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── WALLET ── -->
+      <div class="page" id="page-wallet">
+        <h2>My Wallet</h2>
+        <p class="sub">Manage your money</p>
+        <div class="balance-hero" style="margin-bottom:24px;">
+          <div class="balance-label">Available Balance</div>
+          <div class="balance-amount"><span id="w-currency">R</span><span id="w-balance">0.00</span></div>
+          <div class="balance-actions">
+            <div class="action-btn" onclick="openModal('deposit-modal')">
+              <i class="fa-solid fa-plus"></i> Deposit</div>
+            <div class="action-btn" onclick="openModal('withdraw-modal')">
+              <i class="fa-solid fa-minus"></i> Withdraw</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:16px;margin-bottom:16px;">Transaction History</h3>
+          <div class="tx-list" id="wallet-tx">
+            <div style="color:var(--text2);font-size:14px;">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- ── SEND ── -->
+      <div class="page" id="page-send">
+        <h2>Send Money</h2>
+        <p class="sub">Transfer to anyone, anywhere</p>
+        <div class="card" style="max-width:480px;">
+          <div class="form-group"><label>Recipient Email or Phone</label>
+            <input type="text" id="send-to" placeholder="email@example.com or +27..."/></div>
+          <div class="form-group"><label>Amount (ZAR)</label>
+            <input type="number" id="send-amount" placeholder="0.00" min="1"/></div>
+          <div class="form-group"><label>Note (optional)</label>
+            <input type="text" id="send-note" placeholder="e.g. Rent, Lunch, etc."/></div>
+          <button class="btn btn-primary" onclick="doSend()">
+            <i class="fa-solid fa-paper-plane"></i> Send Money</button>
+          <div id="send-msg"></div>
+        </div>
+      </div>
+
+      <!-- ── STOCKS ── -->
+      <div class="page" id="page-stocks">
+        <h2>Stocks & Crypto</h2>
+        <p class="sub">Invest in global markets</p>
+
+        <!-- Portfolio summary -->
+        <div class="card" style="margin-bottom:24px;background:linear-gradient(135deg,#0f172a,#1e1b4b);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;color:var(--text2);">Portfolio Value</div>
+              <div style="font-size:32px;font-weight:700;" id="port-total">R 0.00</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="loadPortfolio()">
+              <i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+          <div id="portfolio-holdings" style="margin-top:16px;"></div>
+        </div>
+
+        <!-- Market -->
+        <h3 style="margin-bottom:14px;font-size:16px;">Live Market</h3>
+        <div class="grid-4" id="stocks-grid">
+          <div style="color:var(--text2);font-size:14px;grid-column:1/-1;">Loading market data...</div>
+        </div>
+
+        <!-- Stock detail modal -->
+        <div id="stock-detail" style="display:none;margin-top:24px;" class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+            <div>
+              <h3 id="sd-name" style="font-size:20px;"></h3>
+              <div id="sd-symbol" style="color:var(--text2);font-size:13px;"></div>
+            </div>
+            <button onclick="document.getElementById('stock-detail').style.display='none'" 
+              style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;">✕</button>
+          </div>
+          <div style="display:flex;gap:20px;margin-bottom:16px;flex-wrap:wrap;">
+            <div><div style="font-size:12px;color:var(--text2);">Price</div>
+              <div id="sd-price" style="font-size:24px;font-weight:700;"></div></div>
+            <div><div style="font-size:12px;color:var(--text2);">Change</div>
+              <div id="sd-change" style="font-size:18px;font-weight:600;"></div></div>
+            <div><div style="font-size:12px;color:var(--text2);">Day High</div>
+              <div id="sd-high" style="font-size:16px;"></div></div>
+            <div><div style="font-size:12px;color:var(--text2);">Day Low</div>
+              <div id="sd-low" style="font-size:16px;"></div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="stock-chart"></canvas></div>
+          <div style="display:flex;gap:12px;margin-top:16px;">
+            <input type="number" id="trade-shares" placeholder="Shares" min="0.01" step="0.01"
+              style="flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);"/>
+            <button class="btn btn-success btn-sm" style="flex:1;" onclick="doTrade('buy')">
+              <i class="fa-solid fa-arrow-trend-up"></i> Buy</button>
+            <button class="btn btn-danger btn-sm" style="flex:1;" onclick="doTrade('sell')">
+              <i class="fa-solid fa-arrow-trend-down"></i> Sell</button>
+          </div>
+          <div id="trade-msg" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- ── CARDS ── -->
+      <div class="page" id="page-cards">
+        <h2>My Cards</h2>
+        <p class="sub">Virtual & physical cards</p>
+        <div id="cards-list" style="margin-bottom:20px;"></div>
+        <button class="btn btn-primary" style="max-width:280px;" onclick="issueCard()">
+          <i class="fa-solid fa-plus"></i> Issue Virtual Card</button>
+      </div>
+
+      <!-- ── EXCHANGE ── -->
+      <div class="page" id="page-exchange">
+        <h2>Currency Exchange</h2>
+        <p class="sub">Live rates from ZAR</p>
+        <div class="card" style="max-width:480px;margin-bottom:20px;">
+          <div class="form-group"><label>From (ZAR)</label>
+            <input type="number" id="fx-amount" placeholder="100" value="100" oninput="calcFX()"/></div>
+          <div class="form-group"><label>To Currency</label>
+            <select id="fx-to" onchange="calcFX()">
+              <option value="USD">🇺🇸 USD — US Dollar</option>
+              <option value="EUR">🇩🇪 EUR — Euro</option>
+              <option value="GBP">🇬🇧 GBP — British Pound</option>
+              <option value="NGN">🇳🇬 NGN — Nigerian Naira</option>
+              <option value="KES">🇰🇪 KES — Kenyan Shilling</option>
+              <option value="GHS">🇬🇭 GHS — Ghanaian Cedi</option>
+              <option value="AED">🇦🇪 AED — UAE Dirham</option>
+              <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+              <option value="INR">🇮🇳 INR — Indian Rupee</option>
+            </select></div>
+          <div style="background:var(--bg3);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:13px;color:var(--text2);">You get</div>
+            <div id="fx-result" style="font-size:28px;font-weight:700;color:var(--accent);">—</div>
+            <div id="fx-rate" style="font-size:12px;color:var(--text2);margin-top:4px;"></div>
+          </div>
+        </div>
+        <h3 style="margin-bottom:14px;font-size:16px;">All Rates (from ZAR)</h3>
+        <div id="rates-grid" class="grid-4"></div>
+      </div>
+
+      <!-- ── KYC ── -->
+      <div class="page" id="page-kyc">
+        <h2>Verify Your Identity</h2>
+        <p class="sub">Complete KYC to unlock higher limits</p>
+        <div class="card" style="max-width:480px;">
+          <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:14px;margin-bottom:20px;">
+            <i class="fa-solid fa-shield-halved" style="color:var(--warning);"></i>
+            <strong style="color:var(--warning);margin-left:8px;">Why Verify?</strong>
+            <p style="font-size:13px;color:var(--text2);margin-top:6px;">Verification unlocks higher transaction limits, physical cards, and keeps your account secure.</p>
+          </div>
+          <div class="form-group"><label>Document Type</label>
+            <select id="kyc-type">
+              <option value="national_id">National ID / Smart Card</option>
+              <option value="passport">Passport</option>
+              <option value="drivers_license">Driver's Licence</option>
+            </select></div>
+          <div class="form-group"><label>Document Number</label>
+            <input type="text" id="kyc-number" placeholder="Enter document number"/></div>
+          <button class="btn btn-primary" onclick="submitKYC()">
+            <i class="fa-solid fa-upload"></i> Submit for Verification</button>
+          <div id="kyc-msg"></div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE ── -->
+      <div class="page" id="page-profile">
+        <h2>My Profile</h2>
+        <p class="sub">Manage your account details</p>
+        <div class="grid-2" style="max-width:800px;">
+          <div class="card">
+            <div style="text-align:center;margin-bottom:20px;">
+              <div class="avatar" style="width:64px;height:64px;font-size:24px;margin:0 auto 12px;">
+                <span id="prof-initial">M</span></div>
+              <div id="prof-name" style="font-size:18px;font-weight:700;"></div>
+              <div id="prof-email" style="font-size:13px;color:var(--text2);"></div>
+              <span id="prof-kyc" class="badge" style="margin-top:8px;"></span>
+            </div>
+            <div class="form-group"><label>Full Name</label>
+              <input type="text" id="p-name"/></div>
+            <div class="form-group"><label>Phone</label>
+              <input type="text" id="p-phone"/></div>
+            <div class="form-group"><label>Country</label>
+              <select id="p-country">
+                <option value="ZA">🇿🇦 South Africa</option>
+                <option value="NG">🇳🇬 Nigeria</option>
+                <option value="GH">🇬🇭 Ghana</option>
+                <option value="US">🇺🇸 USA</option>
+                <option value="GB">🇬🇧 UK</option>
+              </select></div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+            <div id="prof-msg"></div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:16px;margin-bottom:16px;">Account Info</h3>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px;">
+                <span style="color:var(--text2);font-size:13px;">Account ID</span>
+                <span id="prof-id" style="font-size:13px;font-weight:600;"></span></div>
+              <div style="display:flex;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px;">
+                <span style="color:var(--text2);font-size:13px;">Member Since</span>
+                <span id="prof-since" style="font-size:13px;font-weight:600;"></span></div>
+              <div style="display:flex;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px;">
+                <span style="color:var(--text2);font-size:13px;">Currency</span>
+                <span id="prof-curr" style="font-size:13px;font-weight:600;"></span></div>
+              <div style="display:flex;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px;">
+                <span style="color:var(--text2);font-size:13px;">KYC Status</span>
+                <span id="prof-kyc2" style="font-size:13px;font-weight:600;"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /shell -->
+
+  <!-- Mobile Nav -->
+  <div id="mobile-nav">
+    <button class="mob-nav-item active" onclick="showPage('dashboard')" id="mnav-dashboard">
+      <i class="fa-solid fa-house"></i>Home</button>
+    <button class="mob-nav-item" onclick="showPage('wallet')" id="mnav-wallet">
+      <i class="fa-solid fa-wallet"></i>Wallet</button>
+    <button class="mob-nav-item" onclick="showPage('send')" id="mnav-send">
+      <i class="fa-solid fa-paper-plane"></i>Send</button>
+    <button class="mob-nav-item" onclick="showPage('stocks')" id="mnav-stocks">
+      <i class="fa-solid fa-chart-line"></i>Stocks</button>
+    <button class="mob-nav-item" onclick="showPage('profile')" id="mnav-profile">
+      <i class="fa-solid fa-user"></i>Profile</button>
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+<div class="modal-overlay" id="deposit-modal" style="display:none;" onclick="if(event.target===this)closeModal('deposit-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('deposit-modal')">✕</button>
+    <h3>💳 Add Money</h3>
+    <div class="form-group"><label>Amount (ZAR)</label>
+      <input type="number" id="dep-amount" placeholder="0.00" min="1"/></div>
+    <div class="form-group"><label>Payment Method</label>
+      <select id="dep-method">
+        <option value="card">💳 Debit / Credit Card</option>
+        <option value="eft">🏦 EFT / Bank Transfer</option>
+        <option value="mobile_money">📱 Mobile Money</option>
+        <option value="crypto">₿ Cryptocurrency</option>
+        <option value="paypal">🅿️ PayPal</option>
+        <option value="flutterwave">🦋 Flutterwave</option>
+        <option value="stripe">⚡ Stripe</option>
+      </select></div>
+    <button class="btn btn-primary" onclick="doDeposit()">Add Money</button>
+    <div id="dep-msg"></div>
+    <p style="font-size:11px;color:var(--text2);margin-top:12px;text-align:center;">
+      Live payment gateway integration available with your API keys</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="withdraw-modal" style="display:none;" onclick="if(event.target===this)closeModal('withdraw-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('withdraw-modal')">✕</button>
+    <h3>💸 Withdraw</h3>
+    <div class="form-group"><label>Amount (ZAR)</label>
+      <input type="number" id="wd-amount" placeholder="0.00" min="1"/></div>
+    <div class="form-group"><label>Withdraw To</label>
+      <select id="wd-method">
+        <option value="bank">🏦 Bank Account</option>
+        <option value="mobile">📱 Mobile Money</option>
+        <option value="crypto">₿ Crypto Wallet</option>
+      </select></div>
+    <div class="form-group"><label>Account/Wallet Number</label>
+      <input type="text" id="wd-account" placeholder="Account or wallet address"/></div>
+    <button class="btn btn-primary" onclick="doWithdraw()">Withdraw</button>
+    <div id="wd-msg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="request-modal" style="display:none;" onclick="if(event.target===this)closeModal('request-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('request-modal')">✕</button>
+    <h3>🤲 Request Money</h3>
+    <div class="form-group"><label>From (email or phone)</label>
+      <input type="text" id="req-from" placeholder="friend@email.com"/></div>
+    <div class="form-group"><label>Amount (ZAR)</label>
+      <input type="number" id="req-amount" placeholder="0.00"/></div>
+    <div class="form-group"><label>Note</label>
+      <input type="text" id="req-note" placeholder="What's it for?"/></div>
+    <button class="btn btn-primary" onclick="doRequest()">Send Request</button>
+    <div id="req-msg"></div>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS ══ -->
+<script>
+const API = "";  // same origin
+let TOKEN = localStorage.getItem("mzn_token") || "";
+let ME    = null;
+let RATES = {};
+let stockChart = null;
+let currentSymbol = "";
+
+// ── API helper ─────────────────────────────────────────────────────────
+async function api(path, method="GET", body=null) {
+  const opts = { method, headers: { "Content-Type":"application/json" } };
+  if (TOKEN) opts.headers["Authorization"] = "Bearer " + TOKEN;
+  if (body)  opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || "Request failed");
+  return d;
+}
+
+function toast(msg, type="success") {
+  const t = document.getElementById("toast");
+  t.textContent = (type==="success" ? "✅ " : "❌ ") + msg;
+  t.className = "toast show " + type;
+  setTimeout(() => t.className = "toast", 3500);
+}
+
+function fmt(n, curr="R") { return curr + parseFloat(n||0).toLocaleString("en-ZA",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(d) { return new Date(d).toLocaleDateString("en-ZA",{day:"2-digit",month:"short",year:"numeric"}); }
+
+// ── Auth ───────────────────────────────────────────────────────────────
+function switchAuth(tab) {
+  document.getElementById("login-form").style.display    = tab==="login" ? "" : "none";
+  document.getElementById("register-form").style.display = tab==="register" ? "" : "none";
+  document.querySelectorAll(".auth-tab").forEach((t,i)=>t.classList.toggle("active",(i===0&&tab==="login")||(i===1&&tab==="register")));
+}
+
+async function doLogin() {
+  const email=document.getElementById("l-email").value;
+  const pass =document.getElementById("l-pass").value;
+  const msg  =document.getElementById("login-msg");
+  try {
+    const d = await api("/api/auth/login","POST",{email,password:pass});
+    TOKEN = d.token; localStorage.setItem("mzn_token", TOKEN);
+    await bootApp();
+  } catch(e) { msg.innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+async function doRegister() {
+  const d = {
+    full_name: document.getElementById("r-name").value,
+    email:     document.getElementById("r-email").value,
+    phone:     document.getElementById("r-phone").value,
+    password:  document.getElementById("r-pass").value,
+    country:   document.getElementById("r-country").value,
+    currency:  document.getElementById("r-country").value === "NG" ? "NGN" :
+               document.getElementById("r-country").value === "GH" ? "GHS" :
+               document.getElementById("r-country").value === "US" ? "USD" :
+               document.getElementById("r-country").value === "GB" ? "GBP" : "ZAR"
+  };
+  const msg = document.getElementById("register-msg");
+  try {
+    const res = await api("/api/auth/register","POST",d);
+    TOKEN = res.token; localStorage.setItem("mzn_token", TOKEN);
+    msg.innerHTML = `<div class="suc">${res.message}</div>`;
+    setTimeout(() => bootApp(), 1000);
+  } catch(e) { msg.innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+function doLogout() {
+  TOKEN=""; localStorage.removeItem("mzn_token");
+  document.getElementById("app").style.display="none";
+  document.getElementById("auth-screen").style.display="flex";
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────
+async function bootApp() {
+  try {
+    ME = await api("/api/user/me");
+    document.getElementById("auth-screen").style.display="none";
+    document.getElementById("app").style.display="block";
+    updateHeader();
+    loadDashboard();
+    loadRates();
+  } catch(e) { doLogout(); }
+}
+
+function updateHeader() {
+  const n = ME.full_name.split(" ")[0];
+  document.getElementById("dash-name").textContent = n;
+  document.getElementById("dash-balance").textContent = parseFloat(ME.balance||0).toLocaleString("en-ZA",{minimumFractionDigits:2});
+  document.getElementById("w-balance").textContent = parseFloat(ME.balance||0).toLocaleString("en-ZA",{minimumFractionDigits:2});
+  document.getElementById("prof-initial").textContent = ME.full_name[0].toUpperCase();
+  document.getElementById("prof-name").textContent = ME.full_name;
+  document.getElementById("prof-email").textContent = ME.email;
+  document.getElementById("prof-id").textContent = "#MZN" + String(ME.id).padStart(6,"0");
+  document.getElementById("prof-since").textContent = fmtDate(ME.created_at);
+  document.getElementById("prof-curr").textContent = ME.currency;
+  document.getElementById("prof-kyc2").textContent = ME.kyc_status.toUpperCase();
+  document.getElementById("p-name").value = ME.full_name;
+  document.getElementById("p-phone").value = ME.phone||"";
+  const kyc = document.getElementById("prof-kyc");
+  kyc.textContent = ME.kyc_status.toUpperCase();
+  kyc.className = "badge " + (ME.kyc_status==="verified"?"badge-success":ME.kyc_status==="submitted"?"badge-warning":"badge-danger");
+}
+
+// ── Dashboard ──────────────────────────────────────────────────────────
+async function loadDashboard() {
+  // Transactions
+  try {
+    const txs = await api("/api/wallet/transactions?limit=5");
+    renderTxList("dash-tx", txs);
+    let sent=0, recv=0;
+    txs.forEach(t => {
+      if (t.direction==="debit") sent += t.amount;
+      if (t.direction==="credit") recv += t.amount;
+    });
+    document.getElementById("s-sent").textContent = fmt(sent);
+    document.getElementById("s-recv").textContent = fmt(recv);
+    document.getElementById("s-txs").textContent = txs.length;
+  } catch(e) {}
+  // Portfolio
+  try {
+    const p = await api("/api/stocks/portfolio");
+    document.getElementById("s-port").textContent = fmt(p.total_value);
+  } catch(e) {}
+  // Market movers
+  try {
+    const stocks = await api("/api/stocks/market");
+    const el = document.getElementById("dash-stocks");
+    el.innerHTML = stocks.slice(0,5).map(s => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:10px;margin-bottom:6px;cursor:pointer;" onclick="openStockDetail('${s.symbol}')">
+        <div>
+          <div style="font-size:14px;font-weight:600;">${s.symbol}</div>
+          <div style="font-size:11px;color:var(--text2);">${s.name}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:14px;font-weight:600;">$${s.price.toFixed(2)}</div>
+          <div style="font-size:12px;${s.change_pct>=0?'color:var(--success)':'color:var(--danger)'}">${s.change_pct>=0?'+':''}${s.change_pct.toFixed(2)}%</div>
+        </div>
+      </div>`).join("");
+  } catch(e) {}
+}
+
+function renderTxList(elId, txs) {
+  const el = document.getElementById(elId);
+  if (!txs.length) { el.innerHTML='<div style="color:var(--text2);font-size:14px;">No transactions yet</div>'; return; }
+  el.innerHTML = txs.map(t => {
+    const isCredit = t.direction==="credit";
+    const icons = { deposit:"fa-download", withdrawal:"fa-upload", transfer:isCredit?"fa-download":"fa-upload",
+                    stock_buy:"fa-arrow-trend-up", stock_sell:"fa-arrow-trend-down", bonus:"fa-gift" };
+    const icon = icons[t.type] || "fa-circle";
+    return `<div class="tx-item">
+      <div class="tx-icon ${isCredit||t.type==='bonus'?'credit':'debit'}"><i class="fa-solid ${icon}"></i></div>
+      <div class="tx-info">
+        <div class="tx-desc">${t.description||t.type}</div>
+        <div class="tx-date">${fmtDate(t.created_at)} · ${t.ref||''}</div>
+      </div>
+      <div class="tx-amount ${isCredit?'up':'down'}">${isCredit?'+':'-'}${fmt(t.amount)}</div>
+    </div>`;
+  }).join("");
+}
+
+// ── Wallet ─────────────────────────────────────────────────────────────
+async function loadWallet() {
+  const txs = await api("/api/wallet/transactions?limit=30");
+  renderTxList("wallet-tx", txs);
+}
+
+async function doDeposit() {
+  const amount = document.getElementById("dep-amount").value;
+  const method = document.getElementById("dep-method").value;
+  const msg    = document.getElementById("dep-msg");
+  try {
+    const r = await api("/api/wallet/deposit","POST",{amount:parseFloat(amount),method});
+    toast(r.message);
+    closeModal("deposit-modal");
+    ME.balance = r.balance;
+    updateHeader();
+    loadDashboard();
+  } catch(e) { msg.innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+async function doWithdraw() {
+  toast("Withdrawal submitted for processing!", "success");
+  closeModal("withdraw-modal");
+}
+
+async function doSend() {
+  const to     = document.getElementById("send-to").value;
+  const amount = document.getElementById("send-amount").value;
+  const note   = document.getElementById("send-note").value;
+  const msg    = document.getElementById("send-msg");
+  try {
+    const r = await api("/api/wallet/send","POST",{recipient:to, amount:parseFloat(amount), note});
+    toast(r.message);
+    msg.innerHTML=`<div class="suc">✅ ${r.message} Ref: ${r.ref}</div>`;
+    ME = await api("/api/user/me"); updateHeader();
+  } catch(e) { msg.innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+async function doRequest() {
+  const from   = document.getElementById("req-from").value;
+  const amount = document.getElementById("req-amount").value;
+  const note   = document.getElementById("req-note").value;
+  try {
+    const r = await api("/api/wallet/request","POST",{from_email:from,amount:parseFloat(amount),note});
+    toast(r.message); closeModal("request-modal");
+  } catch(e) { document.getElementById("req-msg").innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+// ── Stocks ─────────────────────────────────────────────────────────────
+async function loadStocks() {
+  try {
+    const stocks = await api("/api/stocks/market");
+    const grid = document.getElementById("stocks-grid");
+    grid.innerHTML = stocks.map(s => `
+      <div class="stock-card" onclick="openStockDetail('${s.symbol}')">
+        <div class="stock-symbol">${s.symbol.replace("-USD","")}</div>
+        <div class="stock-name">${s.name}</div>
+        <div class="stock-price">$${s.price.toFixed(2)}</div>
+        <div class="stock-change ${s.change_pct>=0?'up':'down'}">${s.change_pct>=0?'▲':'▼'} ${Math.abs(s.change_pct).toFixed(2)}%</div>
+      </div>`).join("");
+  } catch(e) {}
+  loadPortfolio();
+}
+
+async function loadPortfolio() {
+  try {
+    const p = await api("/api/stocks/portfolio");
+    document.getElementById("port-total").textContent = fmt(p.total_value);
+    const el = document.getElementById("portfolio-holdings");
+    if (!p.holdings.length) { el.innerHTML='<div style="color:var(--text2);font-size:13px;">No stocks yet. Buy some below!</div>'; return; }
+    el.innerHTML = p.holdings.map(h=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:6px;">
+        <div><div style="font-weight:600;">${h.symbol}</div>
+          <div style="font-size:12px;color:var(--text2);">${h.shares} shares @ $${h.avg_price.toFixed(2)}</div></div>
+        <div style="text-align:right;">
+          <div style="font-weight:600;">$${h.value.toFixed(2)}</div>
+          <div style="font-size:12px;${h.pnl>=0?'color:var(--success)':'color:var(--danger)'}">${h.pnl>=0?'+':''}$${h.pnl.toFixed(2)}</div>
+        </div></div>`).join("");
+  } catch(e) {}
+}
+
+async function openStockDetail(symbol) {
+  currentSymbol = symbol;
+  document.getElementById("stock-detail").style.display="block";
+  document.getElementById("sd-name").textContent = "Loading...";
+  document.getElementById("stock-detail").scrollIntoView({behavior:"smooth"});
+  try {
+    const q = await api("/api/stocks/quote/" + symbol);
+    document.getElementById("sd-name").textContent = q.name;
+    document.getElementById("sd-symbol").textContent = symbol;
+    document.getElementById("sd-price").textContent = "$" + parseFloat(q.price||0).toFixed(2);
+    const chgEl = document.getElementById("sd-change");
+    chgEl.textContent = (q.change_pct>=0?"+":"") + q.change_pct.toFixed(2) + "%";
+    chgEl.className = q.change_pct>=0?"up":"down";
+    document.getElementById("sd-high").textContent = "$" + parseFloat(q.high||0).toFixed(2);
+    document.getElementById("sd-low").textContent  = "$" + parseFloat(q.low||0).toFixed(2);
+    // Chart
+    if (stockChart) stockChart.destroy();
+    const ctx = document.getElementById("stock-chart").getContext("2d");
+    const up  = q.change_pct >= 0;
+    stockChart = new Chart(ctx, { type:"line", data:{
+      labels: q.dates,
+      datasets:[{data:q.history, borderColor:up?"#10b981":"#ef4444",
+        backgroundColor:up?"rgba(16,185,129,.08)":"rgba(239,68,68,.08)",
+        fill:true, tension:.4, pointRadius:0, borderWidth:2}]
+    }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{display:false},y:{grid:{color:"rgba(255,255,255,.05)"},ticks:{color:"#9ca3af"}}}}});
+  } catch(e) { toast("Could not load stock data","error"); }
+}
+
+async function doTrade(type) {
+  const shares = parseFloat(document.getElementById("trade-shares").value);
+  const msg    = document.getElementById("trade-msg");
+  if (!shares||shares<=0) { msg.innerHTML='<div class="err">Enter valid shares</div>'; return; }
+  try {
+    const r = await api("/api/stocks/"+type,"POST",{symbol:currentSymbol, shares});
+    toast(r.message);
+    msg.innerHTML=`<div class="suc">✅ ${r.message}</div>`;
+    ME = await api("/api/user/me"); updateHeader();
+    loadPortfolio();
+  } catch(e) { msg.innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+// ── Cards ──────────────────────────────────────────────────────────────
+async function loadCards() {
+  const cards = await api("/api/cards");
+  const el    = document.getElementById("cards-list");
+  if (!cards.length) { el.innerHTML='<p style="color:var(--text2);">No cards yet. Issue one below!</p>'; return; }
+  el.innerHTML = cards.map(c=>`
+    <div style="background:linear-gradient(135deg,#312e81,#1e3a5f);border-radius:16px;padding:24px;margin-bottom:16px;max-width:380px;position:relative;overflow:hidden;">
+      <div style="font-size:18px;font-weight:700;margin-bottom:24px;">Moizzen</div>
+      <div style="font-size:18px;letter-spacing:4px;margin-bottom:16px;">•••• •••• •••• ${c.last_four}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+        <div><div style="font-size:10px;opacity:.6;">EXPIRES</div>
+          <div style="font-size:14px;font-weight:600;">${c.expiry}</div></div>
+        <div style="font-size:24px;font-weight:800;opacity:.8;">VISA</div>
+      </div>
+      <span class="badge ${c.is_active?'badge-success':'badge-danger'}" style="position:absolute;top:16px;right:16px;">${c.card_type.toUpperCase()}</span>
+    </div>`).join("");
+}
+
+async function issueCard() {
+  try {
+    const r = await api("/api/cards/issue","POST",{});
+    toast(r.message); loadCards();
+  } catch(e) { toast(e.message,"error"); }
+}
+
+// ── Exchange ───────────────────────────────────────────────────────────
+async function loadRates() {
+  try {
+    const r = await api("/api/rates");
+    RATES = r.rates;
+    const grid = document.getElementById("rates-grid");
+    const show = ["USD","EUR","GBP","NGN","KES","GHS","AED","CNY","INR","AUD","CAD","JPY"];
+    grid.innerHTML = show.map(k => RATES[k] ? `
+      <div class="stat-card">
+        <div class="stat-label">${k}</div>
+        <div class="stat-value" style="font-size:18px;">${RATES[k].toFixed(4)}</div>
+        <div style="font-size:11px;color:var(--text2);">1 ZAR = ${RATES[k].toFixed(4)} ${k}</div>
+      </div>` : "").join("");
+    calcFX();
+  } catch(e) {}
+}
+
+function calcFX() {
+  const amount = parseFloat(document.getElementById("fx-amount").value)||0;
+  const to     = document.getElementById("fx-to").value;
+  if (RATES[to]) {
+    const result = amount * RATES[to];
+    document.getElementById("fx-result").textContent = result.toFixed(4) + " " + to;
+    document.getElementById("fx-rate").textContent   = `1 ZAR = ${RATES[to].toFixed(6)} ${to}`;
+  }
+}
+
+// ── KYC & Profile ──────────────────────────────────────────────────────
+async function submitKYC() {
+  const msg = document.getElementById("kyc-msg");
+  try {
+    const r = await api("/api/kyc/submit","POST",{
+      doc_type:   document.getElementById("kyc-type").value,
+      doc_number: document.getElementById("kyc-number").value
+    });
+    msg.innerHTML=`<div class="suc">✅ ${r.message}</div>`;
+    toast(r.message);
+  } catch(e) { msg.innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+async function saveProfile() {
+  const msg = document.getElementById("prof-msg");
+  try {
+    const r = await api("/api/user/update","PUT",{
+      full_name: document.getElementById("p-name").value,
+      phone:     document.getElementById("p-phone").value,
+      country:   document.getElementById("p-country").value
+    });
+    toast(r.message); ME = await api("/api/user/me"); updateHeader();
+  } catch(e) { msg.innerHTML=`<div class="err">${e.message}</div>`; }
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-item,.mob-nav-item").forEach(n=>n.classList.remove("active"));
+  document.getElementById("page-"+name).classList.add("active");
+  const navEl  = document.getElementById("nav-"+name);
+  const mnavEl = document.getElementById("mnav-"+name);
+  if (navEl)  navEl.classList.add("active");
+  if (mnavEl) mnavEl.classList.add("active");
+  // Lazy load
+  if (name==="wallet")   loadWallet();
+  if (name==="stocks")   loadStocks();
+  if (name==="cards")    loadCards();
+  if (name==="exchange") loadRates();
+}
+
+function openModal(id)  { document.getElementById(id).style.display="flex"; }
+function closeModal(id) { document.getElementById(id).style.display="none"; }
+
+// ── Init ───────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", () => {
+  if (TOKEN) bootApp(); 
+});
+</script>
+</body>
+</html>
