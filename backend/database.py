@@ -1,7 +1,7 @@
 import sqlite3, os
 from datetime import datetime
 
-DB = os.path.join(os.path.dirname(__file__), "moizzen.db")
+DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "moizzen.db")
 
 def conn():
     c = sqlite3.connect(DB, check_same_thread=False)

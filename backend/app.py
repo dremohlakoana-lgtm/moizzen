@@ -1,13 +1,15 @@
+import os, sys
+# Make sure backend folder is in path so 'database' module is found
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, BASE_DIR)
+
 from flask import Flask, request, jsonify, send_from_directory
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
-import bcrypt, uuid, json, os, sys
+import bcrypt, uuid, json
 from datetime import datetime, timedelta
 from database import conn, init
 import yfinance as yf
-
-import os
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET", "moizzen-secret-key-2024-change-in-prod")
