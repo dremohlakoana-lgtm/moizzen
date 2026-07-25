@@ -486,3 +486,17 @@ def serve(path):
 if __name__ == "__main__":
     print("🏦 Moizzen Banking API starting...")
     app.run(host="0.0.0.0", port=5000, debug=False)
+
+# ── Admin Setup (first time only) ─────────────────────────────────────────────
+@app.route("/api/admin/setup", methods=["POST"])
+def admin_setup():
+    """Make a user admin - use once to set up your first admin"""
+    d      = request.json
+    secret = d.get("setup_secret","")
+    email  = d.get("email","")
+    if secret != os.environ.get("ADMIN_SETUP_SECRET","moizzen-admin-2024"):
+        return jsonify({"error": "Wrong secret"}), 403
+    db = conn(); c = db.cursor()
+    c.execute("UPDATE users SET is_admin=1 WHERE email=?", (email,))
+    db.commit(); db.close()
+    return jsonify({"message": f"✅ {email} is now admin!"})
