@@ -3,7 +3,7 @@ services:
     name: moizzen
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn backend.app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
     envVars:
       - key: JWT_SECRET
         generateValue: true
