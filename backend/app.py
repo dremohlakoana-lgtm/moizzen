@@ -483,14 +483,9 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     return send_from_directory(app.static_folder, "index.html")
 
-if __name__ == "__main__":
-    print("🏦 Moizzen Banking API starting...")
-    app.run(host="0.0.0.0", port=5000, debug=False)
-
-# ── Admin Setup (first time only) ─────────────────────────────────────────────
+# ── Admin Setup ───────────────────────────────────────────────────────────────
 @app.route("/api/admin/setup", methods=["POST"])
 def admin_setup():
-    """Make a user admin - use once to set up your first admin"""
     d      = request.json
     secret = d.get("setup_secret","")
     email  = d.get("email","")
@@ -500,3 +495,7 @@ def admin_setup():
     c.execute("UPDATE users SET is_admin=1 WHERE email=?", (email,))
     db.commit(); db.close()
     return jsonify({"message": f"✅ {email} is now admin!"})
+
+if __name__ == "__main__":
+    print("🏦 Moizzen Banking API starting...")
+    app.run(host="0.0.0.0", port=5000, debug=False)
