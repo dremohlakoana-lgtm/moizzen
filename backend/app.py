@@ -6,7 +6,10 @@ from datetime import datetime, timedelta
 from database import conn, init
 import yfinance as yf
 
-app = Flask(__name__, static_folder="../frontend", static_url_path="")
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
+app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET", "moizzen-secret-key-2024-change-in-prod")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
 CORS(app)
