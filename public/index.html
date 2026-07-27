@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Moizzen</title>
+<title>Moizze Smart Banking</title>
 <style>
   :root {
     --bg:#07080f; --card:#0e0f1c; --card2:#13152a; --border:#1c1e35;
@@ -182,21 +182,21 @@
 <div class="screen active" id="splash">
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;">
     <div class="sc">🏦</div>
-    <div class="logo">Moiz<span>zen</span></div>
-    <p style="color:var(--muted);font-size:0.83rem;margin-top:8px;">Smart banking. Your way.</p>
+    <div class="logo">Moizze</div>
+    <p style="color:var(--muted);font-size:0.83rem;margin-top:8px;">Smart Banking · Buy Stocks · Send Money</p>
     <div style="margin-top:48px;width:240px;">
       <button class="btn btn-p" onclick="showScreen('auth')">Get Started</button>
       <button class="btn btn-o" onclick="demoLogin()">Demo Login</button>
     </div>
   </div>
-  <p style="text-align:center;font-size:0.68rem;color:#222;padding:20px;">Moizzen Financial Technology © 2025</p>
+  <p style="text-align:center;font-size:0.68rem;color:#222;padding:20px;">Moizze Financial Technology © 2025</p>
 </div>
 
 <!-- ════ AUTH ════ -->
 <div class="screen" id="auth">
   <div style="padding:48px 24px 0;">
-    <div class="logo" style="font-size:1.8rem;">Moiz<span>zen</span></div>
-    <p style="color:var(--muted);font-size:0.78rem;margin-top:4px;margin-bottom:26px;">Smart banking. Your way.</p>
+    <div class="logo" style="font-size:1.8rem;">Moizze</div>
+    <p style="color:var(--muted);font-size:0.78rem;margin-top:4px;margin-bottom:26px;">Smart Banking · Buy Stocks · Send Money</p>
     <div class="tabs">
       <div class="tab active" onclick="switchTab('login',this)">Login</div>
       <div class="tab" onclick="switchTab('register',this)">Register</div>
@@ -206,7 +206,7 @@
     <div id="pane-login">
       <div class="fg"><label class="fl">Phone or Email</label><input class="fi" type="text" placeholder="Enter phone or email"></div>
       <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Your password"></div>
-      <button class="btn btn-p" style="margin-top:18px;" onclick="demoLogin()">Login to Moizzen</button>
+      <button class="btn btn-p" style="margin-top:18px;" onclick="demoLogin()">Login to Moizze</button>
       <p style="text-align:center;margin-top:14px;font-size:0.78rem;color:var(--muted);cursor:pointer;" onclick="showToast('🔗 Reset link sent to your email')">Forgot password?</p>
     </div>
     <div id="pane-register" style="display:none;">
@@ -365,7 +365,7 @@
 
   <!-- MAKE VOUCHER -->
   <div class="spanel" id="spanel-voucher">
-    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">Generate a voucher code — share it with anyone to send money. No Moizzen account needed to receive!</p>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">Generate a voucher code — share it with anyone to send money. No Moizze account needed to receive!</p>
     <div class="fg"><label class="fl">Voucher Amount (R)</label><input class="fi" type="number" placeholder="0.00" id="vch-amount"></div>
     <div class="qamt-row">
       <div class="qamt" onclick="setVchAmt(50)">R50</div>
@@ -458,7 +458,7 @@
       <div class="mi-lbl">Security & PIN</div>
       <div class="pg">›</div>
     </div>
-    <div class="mi" onclick="showToast('Support: support@moizzen.co.za')">
+    <div class="mi" onclick="showToast('Support: support@moizze.co.za')">
       <div class="mi-ico">💬</div>
       <div class="mi-lbl">Help & Support</div>
       <div class="pg">›</div>
@@ -471,7 +471,7 @@
       <div class="pg">›</div>
     </div>
   </div>
-  <p style="text-align:center;font-size:0.68rem;color:#222;padding:16px;">Moizzen v1.0.0 · Moizzen Financial Technology</p>
+  <p style="text-align:center;font-size:0.68rem;color:#222;padding:16px;">Moizze v1.0.0 · Moizze Financial Technology</p>
 </div>
 
 <!-- ════ BOTTOM NAV ════ -->
@@ -657,7 +657,7 @@ function copyVch(){
 function shareVch(){
   const code=document.getElementById('vch-code-out').textContent;
   const amt=document.getElementById('vch-amt-out').textContent;
-  const msg='Here is your Moizzen voucher for '+amt+':%0ACODE: *'+code+'*%0ARedeem at moizzen.co.za';
+  const msg='Here is your Moizze voucher for '+amt+':%0ACODE: *'+code+'*%0ARedeem at moizze.co.za';
   window.open('https://wa.me/?text='+msg,'_blank');
 }
 
