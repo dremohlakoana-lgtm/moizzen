@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Moizzen</title>
+<style>
+  :root {
+    --bg:#07080f; --card:#0e0f1c; --card2:#13152a; --border:#1c1e35;
+    --purple:#7c5cfc; --purple2:#9d7dfd; --pglow:rgba(124,92,252,0.18);
+    --green:#22d17a; --gglow:rgba(34,209,122,0.15);
+    --red:#f05252; --yellow:#f5c842;
+    --text:#e8eaf0; --muted:#6b7280; --muted2:#4b5563;
+    --r:16px; --rs:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;min-height:100vh}
+  .phone{width:100%;max-width:420px;min-height:100vh;position:relative}
+  .screen{display:none;flex-direction:column;min-height:100vh}
+  .screen.active{display:flex}
+  input,button{font-family:inherit}
+
+  /* SPLASH */
+  #splash{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#1a0d4a,var(--bg) 70%)}
+  .sc{width:110px;height:110px;border-radius:50%;background:var(--pglow);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:2.8rem;margin-bottom:20px;box-shadow:0 0 60px rgba(124,92,252,0.3)}
+  .logo{font-size:2.4rem;font-weight:900;letter-spacing:-1px;color:#fff}
+  .logo span{color:var(--purple2)}
+
+  /* BTN */
+  .btn{width:100%;padding:14px;border-radius:var(--rs);font-size:0.95rem;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;margin-top:10px}
+  .btn-p{background:linear-gradient(135deg,var(--purple),#5b3fd4);color:#fff;box-shadow:0 4px 20px rgba(124,92,252,0.35)}
+  .btn-o{background:transparent;color:var(--purple2);border:1.5px solid var(--purple)}
+  .btn-g{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff}
+  .btn-r{background:rgba(240,82,82,0.15);color:var(--red);border:1px solid rgba(240,82,82,0.3)}
+
+  /* AUTH */
+  #auth{padding:48px 24px 32px}
+  .tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:26px}
+  .tab{flex:1;padding:10px;text-align:center;border-radius:9px;font-size:0.88rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all 0.2s}
+  .tab.active{background:var(--purple);color:#fff}
+  .fg{margin-bottom:14px}
+  .fl{font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.5px}
+  .fi{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:13px 16px;color:var(--text);font-size:0.92rem;outline:none;transition:border-color 0.2s}
+  .fi:focus{border-color:var(--purple)}
+  .fi::placeholder{color:var(--muted2)}
+
+  /* DASHBOARD */
+  #dashboard{padding-bottom:90px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px}
+  .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#5b3fd4);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;cursor:pointer}
+
+  /* BALANCE CARD */
+  .bal-card{margin:0 16px 20px;background:linear-gradient(135deg,#1a0d4a,#2d1b69);border:1px solid #2d1f5e;border-radius:22px;padding:24px;position:relative;overflow:hidden}
+  .bal-card::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:rgba(124,92,252,0.18);border-radius:50%}
+  .bal-card::after{content:'';position:absolute;bottom:-70px;left:-30px;width:200px;height:200px;background:rgba(93,63,212,0.1);border-radius:50%}
+  .bal-lbl{font-size:0.72rem;color:#a78bfa;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+  .bal-amt{font-size:2.8rem;font-weight:900;color:#fff;margin:6px 0 2px;letter-spacing:-1px;position:relative;z-index:1}
+  .bal-acct{font-size:0.72rem;color:#a78bfa}
+  .chips{display:flex;gap:8px;margin-top:16px;position:relative;z-index:1;flex-wrap:wrap}
+  .chip{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.12);border-radius:99px;padding:4px 12px;font-size:0.68rem;color:#d1c4ff;font-weight:600}
+  .chip.g{background:rgba(34,209,122,0.15);border-color:rgba(34,209,122,0.25);color:#6ee7b7}
+
+  /* QUICK ACTIONS */
+  .qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px;margin-bottom:22px}
+  .qa{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s}
+  .qa:hover{border-color:var(--purple);background:var(--pglow)}
+  .qa-ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+  .qa-lbl{font-size:0.66rem;color:var(--muted);font-weight:600;text-align:center;line-height:1.3}
+
+  /* SECTION */
+  .sh{display:flex;justify-content:space-between;align-items:center;padding:0 16px;margin-bottom:10px}
+  .st{font-size:0.9rem;font-weight:700}
+  .sl{font-size:0.75rem;color:var(--purple2);font-weight:600;cursor:pointer}
+
+  /* TX */
+  .tx-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+  .tx{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:13px;display:flex;align-items:center;gap:12px}
+  .txi{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+  .txi.in{background:var(--gglow)} .txi.out{background:rgba(240,82,82,0.12)} .txi.vch{background:var(--pglow)}
+  .txb{flex:1} .txn{font-weight:600;font-size:0.85rem} .txd{font-size:0.7rem;color:var(--muted);margin-top:2px}
+  .txa{font-weight:800;font-size:0.88rem} .txa.in{color:var(--green)} .txa.out{color:var(--red)}
+
+  /* STOCKS STRIP */
+  .strip{display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none}
+  .strip::-webkit-scrollbar{display:none}
+  .stk{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:13px 11px;min-width:115px;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+  .stk:hover{border-color:var(--purple)}
+  .stk-t{font-size:0.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+  .stk-n{font-size:0.78rem;font-weight:600;margin:3px 0}
+  .stk-p{font-size:0.96rem;font-weight:800;color:#fff}
+  .stk-c{font-size:0.68rem;font-weight:600;margin-top:2px}
+  .up{color:var(--green)} .dn{color:var(--red)}
+
+  /* BOTTOM NAV */
+  .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:var(--card);border-top:1px solid var(--border);display:flex;padding:10px 0 18px;z-index:100}
+  .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0}
+  .ni-ico{font-size:1.3rem}
+  .ni-lbl{font-size:0.6rem;font-weight:600;color:var(--muted)}
+  .ni.active .ni-lbl{color:var(--purple2)}
+
+  /* MODAL */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+  .overlay.open{display:flex}
+  .modal{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px 40px;width:100%;max-width:420px;border-top:1px solid var(--border);animation:up 0.25s ease}
+  @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .mh{width:36px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 18px}
+  .mt{font-size:1.1rem;font-weight:800;margin-bottom:16px}
+  .amt-box{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:16px;text-align:center;font-size:2.2rem;font-weight:900;color:#fff;margin-bottom:14px;letter-spacing:-1px}
+  .amt-pfx{font-size:1rem;color:var(--muted);margin-right:4px;font-weight:600}
+  .kpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .key{background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:16px;text-align:center;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all 0.15s;color:var(--text);user-select:none}
+  .key:active{background:var(--pglow);border-color:var(--purple)}
+
+  /* VOUCHER BOX */
+  .vbox{background:linear-gradient(135deg,#1a0d4a,#0e0f1c);border:2px dashed var(--purple);border-radius:var(--r);padding:20px;text-align:center;margin:14px 0}
+  .vcode{font-size:1.4rem;font-weight:900;color:var(--purple2);letter-spacing:3px;font-family:monospace}
+  .vlbl{font-size:0.7rem;color:var(--muted);margin-top:5px}
+  .vamt{font-size:0.88rem;color:var(--green);font-weight:700;margin-top:8px}
+
+  /* KYC */
+  .kyc{margin:0 16px 14px;background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.25);border-radius:var(--rs);padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+
+  /* INVEST */
+  #invest{padding:20px 16px 100px}
+  .port{background:linear-gradient(135deg,#0a2015,#07080f);border:1px solid rgba(34,209,122,0.2);border-radius:var(--r);padding:20px;margin-bottom:20px}
+  .port-lbl{font-size:0.7rem;color:rgba(34,209,122,0.7);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+  .port-val{font-size:2rem;font-weight:900;color:#fff;margin:6px 0}
+  .port-gain{font-size:0.8rem;color:var(--green);font-weight:600}
+  .srow{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:13px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s}
+  .srow:hover{border-color:var(--purple)}
+  .slogo{width:42px;height:42px;border-radius:12px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+  .sinfo{flex:1}
+  .sname{font-weight:700;font-size:0.88rem}
+  .sticker{font-size:0.7rem;color:var(--muted)}
+  .sright{text-align:right}
+  .sprice{font-weight:800;font-size:0.9rem}
+  .schg{font-size:0.7rem;font-weight:600}
+
+  /* SEND */
+  #send-screen{padding:20px 16px 100px}
+  .stabs{display:flex;gap:8px;margin-bottom:18px}
+  .stab{flex:1;padding:10px;border-radius:var(--rs);font-size:0.78rem;font-weight:600;text-align:center;cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--muted);transition:all 0.2s}
+  .stab.active{background:var(--pglow);border-color:var(--purple);color:var(--purple2)}
+  .spanel{display:none}
+  .spanel.active{display:block}
+  .ir{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+  .il{font-size:0.77rem;color:var(--muted)}
+  .iv{font-size:0.82rem;font-weight:600}
+  .qamt-row{display:flex;gap:8px;margin:10px 0}
+  .qamt{background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:6px 14px;font-size:0.78rem;color:var(--muted);cursor:pointer;font-weight:600;transition:all 0.2s}
+  .qamt:hover{border-color:var(--purple);color:var(--purple2)}
+
+  /* PROFILE */
+  #profile{padding-bottom:100px}
+  .phdr{background:linear-gradient(135deg,#1a0d4a,var(--bg));padding:40px 20px 28px;text-align:center}
+  .pav{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#5b3fd4);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;color:#fff;margin:0 auto 10px;box-shadow:0 0 30px rgba(124,92,252,0.4)}
+  .pname{font-size:1.2rem;font-weight:800}
+  .pphone{font-size:0.8rem;color:var(--muted);margin-top:3px}
+  .pbadge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.3);border-radius:99px;padding:4px 12px;font-size:0.72rem;font-weight:600;color:var(--yellow)}
+  .msec{padding:16px;display:flex;flex-direction:column;gap:8px}
+  .msec-lbl{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:2px}
+  .mi{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.2s}
+  .mi:hover{border-color:var(--purple)}
+  .mi-ico{font-size:1rem;width:36px;height:36px;background:var(--card2);border-radius:10px;display:flex;align-items:center;justify-content:center}
+  .mi-lbl{font-size:0.85rem;font-weight:600;flex:1}
+  .mi-val{font-size:0.78rem;color:var(--muted);margin-right:6px}
+  .pg{color:var(--muted2);font-size:0.85rem}
+
+  /* TOAST */
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#fff;color:#000;font-weight:700;font-size:0.83rem;padding:11px 22px;border-radius:99px;z-index:999;transition:transform 0.35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  .g8{height:8px} .g16{height:16px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<div class="toast" id="toast">✅ Done!</div>
+
+<!-- ════ SPLASH ════ -->
+<div class="screen active" id="splash">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;">
+    <div class="sc">🏦</div>
+    <div class="logo">Moiz<span>zen</span></div>
+    <p style="color:var(--muted);font-size:0.83rem;margin-top:8px;">Smart banking. Your way.</p>
+    <div style="margin-top:48px;width:240px;">
+      <button class="btn btn-p" onclick="showScreen('auth')">Get Started</button>
+      <button class="btn btn-o" onclick="demoLogin()">Demo Login</button>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:0.68rem;color:#222;padding:20px;">Moizzen Financial Technology © 2025</p>
+</div>
+
+<!-- ════ AUTH ════ -->
+<div class="screen" id="auth">
+  <div style="padding:48px 24px 0;">
+    <div class="logo" style="font-size:1.8rem;">Moiz<span>zen</span></div>
+    <p style="color:var(--muted);font-size:0.78rem;margin-top:4px;margin-bottom:26px;">Smart banking. Your way.</p>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login',this)">Login</div>
+      <div class="tab" onclick="switchTab('register',this)">Register</div>
+    </div>
+  </div>
+  <div style="padding:0 24px;flex:1;">
+    <div id="pane-login">
+      <div class="fg"><label class="fl">Phone or Email</label><input class="fi" type="text" placeholder="Enter phone or email"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Your password"></div>
+      <button class="btn btn-p" style="margin-top:18px;" onclick="demoLogin()">Login to Moizzen</button>
+      <p style="text-align:center;margin-top:14px;font-size:0.78rem;color:var(--muted);cursor:pointer;" onclick="showToast('🔗 Reset link sent to your email')">Forgot password?</p>
+    </div>
+    <div id="pane-register" style="display:none;">
+      <div class="fg"><label class="fl">Full Name</label><input class="fi" type="text" placeholder="Your full name"></div>
+      <div class="fg"><label class="fl">Phone Number</label><input class="fi" type="tel" placeholder="+27 __ ___ ____"></div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="your@email.com"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Min. 8 characters"></div>
+      <button class="btn btn-p" style="margin-top:14px;" onclick="showToast('📱 OTP sent to your phone!');setTimeout(demoLogin,1400)">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DASHBOARD ════ -->
+<div class="screen" id="dashboard">
+  <div class="topbar">
+    <div>
+      <div style="font-size:0.78rem;color:var(--muted);">Good day 👋</div>
+      <div style="font-weight:700;font-size:1rem;">Dee</div>
+    </div>
+    <div class="av" onclick="navTo('profile')">D</div>
+  </div>
+
+  <div class="kyc" onclick="showToast('Upload your ID to unlock higher limits!')">
+    <span style="font-size:1.2rem;">🪪</span>
+    <div style="flex:1;">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--yellow);">Verify your identity</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;">Upload your ID to increase limits</div>
+    </div>
+    <span style="color:var(--yellow);">›</span>
+  </div>
+
+  <div class="bal-card">
+    <div class="bal-lbl">Wallet Balance</div>
+    <div class="bal-amt">R 2,450<span style="font-size:1.4rem;">.00</span></div>
+    <div class="bal-acct">Account: MOZ-0042-1993</div>
+    <div class="chips">
+      <div class="chip g">✅ Verified</div>
+      <div class="chip">Standard Bank Linked</div>
+      <div class="chip">PayFast Active</div>
+    </div>
+  </div>
+
+  <div class="qa-grid">
+    <div class="qa" onclick="openModal('modal-deposit')">
+      <div class="qa-ico" style="background:var(--gglow);">⬇️</div>
+      <div class="qa-lbl">Deposit<br>Voucher</div>
+    </div>
+    <div class="qa" onclick="navTo('send-screen')">
+      <div class="qa-ico" style="background:var(--pglow);">➡️</div>
+      <div class="qa-lbl">Send<br>Money</div>
+    </div>
+    <div class="qa" onclick="openModal('modal-withdraw')">
+      <div class="qa-ico" style="background:rgba(240,82,82,0.12);">🏦</div>
+      <div class="qa-lbl">Withdraw<br>to Bank</div>
+    </div>
+    <div class="qa" onclick="navTo('invest')">
+      <div class="qa-ico" style="background:rgba(245,200,66,0.12);">📈</div>
+      <div class="qa-lbl">Buy<br>Stocks</div>
+    </div>
+  </div>
+
+  <div class="g8"></div>
+  <div class="sh"><div class="st">📈 Top Stocks</div><div class="sl" onclick="navTo('invest')">See all</div></div>
+  <div class="strip">
+    <div class="stk" onclick="navTo('invest')"><div class="stk-t">NPN</div><div class="stk-n">Naspers</div><div class="stk-p">R3,421</div><div class="stk-c up">▲ +1.8%</div></div>
+    <div class="stk" onclick="navTo('invest')"><div class="stk-t">MTN</div><div class="stk-n">MTN Group</div><div class="stk-p">R94.20</div><div class="stk-c up">▲ +0.6%</div></div>
+    <div class="stk" onclick="navTo('invest')"><div class="stk-t">SBK</div><div class="stk-n">Standard Bank</div><div class="stk-p">R228.50</div><div class="stk-c dn">▼ -0.4%</div></div>
+    <div class="stk" onclick="navTo('invest')"><div class="stk-t">SOL</div><div class="stk-n">Sasol</div><div class="stk-p">R143.80</div><div class="stk-c up">▲ +2.1%</div></div>
+    <div class="stk" onclick="navTo('invest')"><div class="stk-t">AGL</div><div class="stk-n">Anglo American</div><div class="stk-p">R518.00</div><div class="stk-c dn">▼ -0.9%</div></div>
+  </div>
+
+  <div class="g16"></div>
+  <div class="sh"><div class="st">📋 Recent Transactions</div><div class="sl">See all</div></div>
+  <div class="tx-list">
+    <div class="tx"><div class="txi in">🎟️</div><div class="txb"><div class="txn">Voucher Deposit</div><div class="txd">Today, 14:32</div></div><div class="txa in">+R500.00</div></div>
+    <div class="tx"><div class="txi out">🏦</div><div class="txb"><div class="txn">Bank Withdrawal</div><div class="txd">Yesterday, 09:15</div></div><div class="txa out">-R200.00</div></div>
+    <div class="tx"><div class="txi vch">➡️</div><div class="txb"><div class="txn">Sent to Thabo</div><div class="txd">25 Jul, 16:00</div></div><div class="txa out">-R150.00</div></div>
+    <div class="tx"><div class="txi in">📈</div><div class="txb"><div class="txn">Stock Dividend - MTN</div><div class="txd">22 Jul, 08:00</div></div><div class="txa in">+R12.50</div></div>
+  </div>
+</div>
+
+<!-- ════ INVEST ════ -->
+<div class="screen" id="invest">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+    <div onclick="navTo('dashboard')" style="cursor:pointer;font-size:1.3rem;">‹</div>
+    <div style="font-size:1.2rem;font-weight:800;">📈 Stocks</div>
+  </div>
+  <div class="port">
+    <div class="port-lbl">My Portfolio</div>
+    <div class="port-val">R1,284.50</div>
+    <div class="port-gain">▲ +R42.30 today (+3.4%)</div>
+  </div>
+  <div style="font-size:0.82rem;font-weight:700;margin-bottom:12px;color:var(--muted);">JSE TOP STOCKS</div>
+  <div class="srow" onclick="openModal('modal-buy-stock');setStkBuy('Naspers','NPN','R3,421')">
+    <div class="slogo">🏢</div>
+    <div class="sinfo"><div class="sname">Naspers</div><div class="sticker">NPN · JSE</div></div>
+    <div class="sright"><div class="sprice">R3,421.00</div><div class="schg up">▲ +1.8%</div></div>
+  </div>
+  <div class="srow" onclick="openModal('modal-buy-stock');setStkBuy('MTN Group','MTN','R94.20')">
+    <div class="slogo">📡</div>
+    <div class="sinfo"><div class="sname">MTN Group</div><div class="sticker">MTN · JSE</div></div>
+    <div class="sright"><div class="sprice">R94.20</div><div class="schg up">▲ +0.6%</div></div>
+  </div>
+  <div class="srow" onclick="openModal('modal-buy-stock');setStkBuy('Standard Bank','SBK','R228.50')">
+    <div class="slogo">🏦</div>
+    <div class="sinfo"><div class="sname">Standard Bank</div><div class="sticker">SBK · JSE</div></div>
+    <div class="sright"><div class="sprice">R228.50</div><div class="schg dn">▼ -0.4%</div></div>
+  </div>
+  <div class="srow" onclick="openModal('modal-buy-stock');setStkBuy('Sasol','SOL','R143.80')">
+    <div class="slogo">⚗️</div>
+    <div class="sinfo"><div class="sname">Sasol</div><div class="sticker">SOL · JSE</div></div>
+    <div class="sright"><div class="sprice">R143.80</div><div class="schg up">▲ +2.1%</div></div>
+  </div>
+  <div class="srow" onclick="openModal('modal-buy-stock');setStkBuy('Anglo American','AGL','R518.00')">
+    <div class="slogo">⛏️</div>
+    <div class="sinfo"><div class="sname">Anglo American</div><div class="sticker">AGL · JSE</div></div>
+    <div class="sright"><div class="sprice">R518.00</div><div class="schg dn">▼ -0.9%</div></div>
+  </div>
+  <div class="srow" onclick="openModal('modal-buy-stock');setStkBuy('Shoprite','SHP','R289.00')">
+    <div class="slogo">🛒</div>
+    <div class="sinfo"><div class="sname">Shoprite</div><div class="sticker">SHP · JSE</div></div>
+    <div class="sright"><div class="sprice">R289.00</div><div class="schg up">▲ +0.3%</div></div>
+  </div>
+</div>
+
+<!-- ════ SEND ════ -->
+<div class="screen" id="send-screen">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+    <div onclick="navTo('dashboard')" style="cursor:pointer;font-size:1.3rem;">‹</div>
+    <div style="font-size:1.2rem;font-weight:800;">➡️ Send Money</div>
+  </div>
+  <div class="stabs">
+    <div class="stab active" onclick="switchSendTab('user',this)">To User</div>
+    <div class="stab" onclick="switchSendTab('voucher',this)">Make Voucher</div>
+    <div class="stab" onclick="switchSendTab('bank',this)">To Bank</div>
+  </div>
+
+  <!-- TO USER -->
+  <div class="spanel active" id="spanel-user">
+    <div class="fg"><label class="fl">Phone Number</label><input class="fi" type="tel" placeholder="+27 __ ___ ____" id="send-phone"></div>
+    <div class="fg"><label class="fl">Amount (R)</label><input class="fi" type="number" placeholder="0.00" id="send-amount"></div>
+    <div class="qamt-row">
+      <div class="qamt" onclick="setAmt(50)">R50</div>
+      <div class="qamt" onclick="setAmt(100)">R100</div>
+      <div class="qamt" onclick="setAmt(200)">R200</div>
+      <div class="qamt" onclick="setAmt(500)">R500</div>
+    </div>
+    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" type="text" placeholder="e.g. Rent, Groceries..."></div>
+    <button class="btn btn-p" style="margin-top:8px;" onclick="doSendUser()">Send Money</button>
+    <div style="margin-top:16px;">
+      <div class="ir"><span class="il">Transfer fee</span><span class="iv" style="color:var(--green);">FREE</span></div>
+      <div class="ir"><span class="il">Delivery time</span><span class="iv">Instant ⚡</span></div>
+      <div class="ir" style="border:none;"><span class="il">Daily limit</span><span class="iv">R5,000.00</span></div>
+    </div>
+  </div>
+
+  <!-- MAKE VOUCHER -->
+  <div class="spanel" id="spanel-voucher">
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">Generate a voucher code — share it with anyone to send money. No Moizzen account needed to receive!</p>
+    <div class="fg"><label class="fl">Voucher Amount (R)</label><input class="fi" type="number" placeholder="0.00" id="vch-amount"></div>
+    <div class="qamt-row">
+      <div class="qamt" onclick="setVchAmt(50)">R50</div>
+      <div class="qamt" onclick="setVchAmt(100)">R100</div>
+      <div class="qamt" onclick="setVchAmt(200)">R200</div>
+      <div class="qamt" onclick="setVchAmt(500)">R500</div>
+    </div>
+    <div id="vch-result" style="display:none;">
+      <div class="vbox">
+        <div class="vlbl">MOIZZEN VOUCHER CODE</div>
+        <div class="vcode" id="vch-code-out">MOZ-0000-0000</div>
+        <div class="vamt" id="vch-amt-out">R0.00</div>
+        <div class="vlbl" style="margin-top:8px;">Valid for 24 hours · Share via WhatsApp or SMS</div>
+      </div>
+      <button class="btn btn-p" onclick="copyVch()">📋 Copy Code</button>
+      <button class="btn btn-o" style="margin-top:8px;" onclick="shareVch()">📤 Share via WhatsApp</button>
+      <button class="btn btn-r" style="margin-top:8px;" onclick="resetVch()">Generate New</button>
+    </div>
+    <div id="vch-generate">
+      <button class="btn btn-p" onclick="generateVch()">🎟️ Generate Voucher</button>
+    </div>
+  </div>
+
+  <!-- TO BANK -->
+  <div class="spanel" id="spanel-bank">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:16px;">
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;">LINKED BANK ACCOUNT</div>
+      <div style="font-weight:700;">Standard Bank</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:2px;">****4821 · Business Account</div>
+    </div>
+    <div class="fg"><label class="fl">Amount to Withdraw (R)</label><input class="fi" type="number" placeholder="0.00" id="bank-amount"></div>
+    <div class="qamt-row">
+      <div class="qamt" onclick="setBankAmt(200)">R200</div>
+      <div class="qamt" onclick="setBankAmt(500)">R500</div>
+      <div class="qamt" onclick="setBankAmt(1000)">R1,000</div>
+    </div>
+    <button class="btn btn-p" style="margin-top:8px;" onclick="doBankWithdraw()">Withdraw to Bank</button>
+    <div style="margin-top:16px;">
+      <div class="ir"><span class="il">Processing fee</span><span class="iv">R2.50</span></div>
+      <div class="ir"><span class="il">Processing time</span><span class="iv">1–2 business days</span></div>
+      <div class="ir" style="border:none;"><span class="il">Powered by</span><span class="iv">PayFast ✅</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PROFILE ════ -->
+<div class="screen" id="profile">
+  <div class="phdr">
+    <div class="pav">D</div>
+    <div class="pname">Dee Mohlakoana</div>
+    <div class="pphone">+27 69 777 8246</div>
+    <div class="pbadge">⚠️ Pending Verification</div>
+  </div>
+  <div class="msec">
+    <div class="msec-lbl">Account</div>
+    <div class="mi" onclick="showToast('Account number: MOZ-0042-1993')">
+      <div class="mi-ico">🪪</div>
+      <div class="mi-lbl">My Account Number</div>
+      <div class="mi-val">MOZ-0042-1993</div>
+      <div class="pg">›</div>
+    </div>
+    <div class="mi" onclick="showToast('Balance: R2,450.00')">
+      <div class="mi-ico">💰</div>
+      <div class="mi-lbl">Wallet Balance</div>
+      <div class="mi-val">R2,450.00</div>
+      <div class="pg">›</div>
+    </div>
+    <div class="mi" onclick="showToast('Bank: Standard Bank ****4821')">
+      <div class="mi-ico">🏦</div>
+      <div class="mi-lbl">Linked Bank</div>
+      <div class="mi-val">Standard Bank</div>
+      <div class="pg">›</div>
+    </div>
+  </div>
+  <div class="msec">
+    <div class="msec-lbl">Settings</div>
+    <div class="mi" onclick="showToast('Upload your ID document')">
+      <div class="mi-ico">🪪</div>
+      <div class="mi-lbl">KYC Verification</div>
+      <div class="mi-val" style="color:var(--yellow);">Pending</div>
+      <div class="pg">›</div>
+    </div>
+    <div class="mi" onclick="showToast('Notifications settings coming soon')">
+      <div class="mi-ico">🔔</div>
+      <div class="mi-lbl">Notifications</div>
+      <div class="pg">›</div>
+    </div>
+    <div class="mi" onclick="showToast('Security settings coming soon')">
+      <div class="mi-ico">🔒</div>
+      <div class="mi-lbl">Security & PIN</div>
+      <div class="pg">›</div>
+    </div>
+    <div class="mi" onclick="showToast('Support: support@moizzen.co.za')">
+      <div class="mi-ico">💬</div>
+      <div class="mi-lbl">Help & Support</div>
+      <div class="pg">›</div>
+    </div>
+  </div>
+  <div class="msec">
+    <div class="mi" onclick="showScreen('splash')" style="border-color:rgba(240,82,82,0.3);">
+      <div class="mi-ico">🚪</div>
+      <div class="mi-lbl" style="color:var(--red);">Logout</div>
+      <div class="pg">›</div>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:0.68rem;color:#222;padding:16px;">Moizzen v1.0.0 · Moizzen Financial Technology</p>
+</div>
+
+<!-- ════ BOTTOM NAV ════ -->
+<div class="bnav" id="bottom-nav" style="display:none;">
+  <div class="ni active" id="nav-home" onclick="navTo('dashboard')"><div class="ni-ico">🏠</div><div class="ni-lbl">Home</div></div>
+  <div class="ni" id="nav-send" onclick="navTo('send-screen')"><div class="ni-ico">➡️</div><div class="ni-lbl">Send</div></div>
+  <div class="ni" id="nav-invest" onclick="navTo('invest')"><div class="ni-ico">📈</div><div class="ni-lbl">Stocks</div></div>
+  <div class="ni" id="nav-profile" onclick="navTo('profile')"><div class="ni-ico">👤</div><div class="ni-lbl">Profile</div></div>
+</div>
+
+<!-- ════ MODALS ════ -->
+
+<!-- DEPOSIT MODAL -->
+<div class="overlay" id="modal-deposit">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt">⬇️ Deposit via Voucher</div>
+    <div class="fg"><label class="fl">Enter Voucher Code</label><input class="fi" type="text" placeholder="e.g. 1234567890" id="dep-code" style="letter-spacing:2px;font-weight:700;"></div>
+    <div class="fg"><label class="fl">Amount on Voucher (R)</label><input class="fi" type="number" placeholder="0.00" id="dep-amount"></div>
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:14px;font-size:0.75rem;color:var(--muted);">
+      💡 Supported: <strong style="color:var(--text);">1Voucher · BluVoucher · OTT Voucher</strong><br>Buy at Pick n Pay, Shoprite, or any spaza shop
+    </div>
+    <button class="btn btn-g" onclick="doDeposit()">✅ Redeem Voucher</button>
+    <button class="btn btn-o" style="margin-top:8px;" onclick="closeModal('modal-deposit')">Cancel</button>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="overlay" id="modal-withdraw">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt">🏦 Withdraw to Bank</div>
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.3rem;">🏦</span>
+      <div><div style="font-weight:700;font-size:0.88rem;">Standard Bank</div><div style="font-size:0.72rem;color:var(--muted);">Business Account ****4821</div></div>
+    </div>
+    <div class="amt-box"><span class="amt-pfx">R</span><span class="amt-val" id="wd-display">0</span></div>
+    <div class="kpad">
+      <div class="key" onclick="kp('1','wd')">1</div><div class="key" onclick="kp('2','wd')">2</div><div class="key" onclick="kp('3','wd')">3</div>
+      <div class="key" onclick="kp('4','wd')">4</div><div class="key" onclick="kp('5','wd')">5</div><div class="key" onclick="kp('6','wd')">6</div>
+      <div class="key" onclick="kp('7','wd')">7</div><div class="key" onclick="kp('8','wd')">8</div><div class="key" onclick="kp('9','wd')">9</div>
+      <div class="key" onclick="kp('.','wd')">.</div><div class="key" onclick="kp('0','wd')">0</div><div class="key" onclick="kp('⌫','wd')">⌫</div>
+    </div>
+    <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px;">Fee: R2.50 · 1–2 business days via PayFast</div>
+    <button class="btn btn-p" onclick="doWithdraw()">Withdraw</button>
+    <button class="btn btn-o" style="margin-top:8px;" onclick="closeModal('modal-withdraw')">Cancel</button>
+  </div>
+</div>
+
+<!-- BUY STOCK MODAL -->
+<div class="overlay" id="modal-buy-stock">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt">📈 Buy Stock — <span id="stk-buy-name">Naspers</span></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:12px;">
+      <span style="font-size:0.78rem;color:var(--muted);">Current price</span>
+      <span style="font-weight:800;font-size:0.88rem;" id="stk-buy-price">R3,421.00</span>
+    </div>
+    <div class="amt-box"><span class="amt-pfx">R</span><span class="amt-val" id="stk-display">0</span></div>
+    <div class="kpad">
+      <div class="key" onclick="kp('1','stk')">1</div><div class="key" onclick="kp('2','stk')">2</div><div class="key" onclick="kp('3','stk')">3</div>
+      <div class="key" onclick="kp('4','stk')">4</div><div class="key" onclick="kp('5','stk')">5</div><div class="key" onclick="kp('6','stk')">6</div>
+      <div class="key" onclick="kp('7','stk')">7</div><div class="key" onclick="kp('8','stk')">8</div><div class="key" onclick="kp('9','stk')">9</div>
+      <div class="key" onclick="kp('.','stk')">.</div><div class="key" onclick="kp('0','stk')">0</div><div class="key" onclick="kp('⌫','stk')">⌫</div>
+    </div>
+    <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px;">Brokerage fee: 0.5% · Powered by EasyEquities</div>
+    <button class="btn btn-g" onclick="doBuyStock()">Buy Stock</button>
+    <button class="btn btn-o" style="margin-top:8px;" onclick="closeModal('modal-buy-stock')">Cancel</button>
+  </div>
+</div>
+
+<script>
+let amounts = { wd:'', stk:'' };
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el){el.classList.add('active');window.scrollTo(0,0);}
+  const nav=document.getElementById('bottom-nav');
+  if(nav) nav.style.display=['dashboard','send-screen','invest','profile'].includes(id)?'flex':'none';
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const m={dashboard:'nav-home','send-screen':'nav-send',invest:'nav-invest',profile:'nav-profile'};
+  if(m[id]){const n=document.getElementById(m[id]);if(n)n.classList.add('active');}
+}
+
+function navTo(id){showScreen(id);}
+function demoLogin(){showScreen('dashboard');}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pane-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('pane-register').style.display=tab==='register'?'block':'none';
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('overlay'))e.target.classList.remove('open');});
+
+function kp(val,ctx){
+  if(val==='⌫'){amounts[ctx]=amounts[ctx].slice(0,-1);}
+  else if(val==='.'&&amounts[ctx].includes('.')){return;}
+  else if(amounts[ctx].length<8){amounts[ctx]+=val;}
+  const d=document.getElementById(ctx+'-display');
+  if(d)d.textContent=amounts[ctx]||'0';
+}
+
+function doDeposit(){
+  const code=document.getElementById('dep-code').value;
+  const amt=document.getElementById('dep-amount').value;
+  if(!code||!amt){showToast('⚠️ Enter voucher code and amount');return;}
+  closeModal('modal-deposit');
+  showToast('✅ R'+amt+' added to your wallet!');
+  document.getElementById('dep-code').value='';
+  document.getElementById('dep-amount').value='';
+}
+
+function doWithdraw(){
+  if(!amounts.wd||parseFloat(amounts.wd)<=0){showToast('⚠️ Enter an amount');return;}
+  closeModal('modal-withdraw');
+  showToast('🏦 Withdrawal of R'+amounts.wd+' processing...');
+  amounts.wd='';
+  const d=document.getElementById('wd-display');if(d)d.textContent='0';
+}
+
+function setStkBuy(name,ticker,price){
+  document.getElementById('stk-buy-name').textContent=name+' ('+ticker+')';
+  document.getElementById('stk-buy-price').textContent=price;
+}
+
+function doBuyStock(){
+  if(!amounts.stk||parseFloat(amounts.stk)<=0){showToast('⚠️ Enter an amount');return;}
+  const name=document.getElementById('stk-buy-name').textContent;
+  closeModal('modal-buy-stock');
+  showToast('📈 Buying R'+amounts.stk+' of '+name+'!');
+  amounts.stk='';
+  const d=document.getElementById('stk-display');if(d)d.textContent='0';
+}
+
+function switchSendTab(tab,el){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('spanel-'+tab).classList.add('active');
+}
+
+function setAmt(v){document.getElementById('send-amount').value=v;}
+function setVchAmt(v){document.getElementById('vch-amount').value=v;}
+function setBankAmt(v){document.getElementById('bank-amount').value=v;}
+
+function doSendUser(){
+  const p=document.getElementById('send-phone').value;
+  const a=document.getElementById('send-amount').value;
+  if(!p||!a){showToast('⚠️ Fill in phone and amount');return;}
+  showToast('✅ R'+a+' sent instantly!');
+  document.getElementById('send-phone').value='';
+  document.getElementById('send-amount').value='';
+}
+
+function doBankWithdraw(){
+  const a=document.getElementById('bank-amount').value;
+  if(!a){showToast('⚠️ Enter withdrawal amount');return;}
+  showToast('🏦 R'+a+' withdrawal submitted via PayFast!');
+  document.getElementById('bank-amount').value='';
+}
+
+function generateVch(){
+  const a=document.getElementById('vch-amount').value;
+  if(!a){showToast('⚠️ Enter voucher amount');return;}
+  const code='MOZ-'+Math.floor(1000+Math.random()*9000)+'-'+Math.floor(1000+Math.random()*9000);
+  document.getElementById('vch-code-out').textContent=code;
+  document.getElementById('vch-amt-out').textContent='R'+parseFloat(a).toFixed(2);
+  document.getElementById('vch-result').style.display='block';
+  document.getElementById('vch-generate').style.display='none';
+}
+
+function copyVch(){
+  const code=document.getElementById('vch-code-out').textContent;
+  navigator.clipboard.writeText(code).catch(()=>{});
+  showToast('📋 Voucher code copied!');
+}
+
+function shareVch(){
+  const code=document.getElementById('vch-code-out').textContent;
+  const amt=document.getElementById('vch-amt-out').textContent;
+  const msg='Here is your Moizzen voucher for '+amt+':%0ACODE: *'+code+'*%0ARedeem at moizzen.co.za';
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+
+function resetVch(){
+  document.getElementById('vch-result').style.display='none';
+  document.getElementById('vch-generate').style.display='block';
+  document.getElementById('vch-amount').value='';
+}
+
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
